@@ -1,0 +1,153 @@
+# cryptography-quiz
+Interactive Cryptography Quiz with 60 questions
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cryptography Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+    .quiz-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
+    h1 { text-align: center; }
+    .question { font-weight: bold; margin: 20px 0 10px; }
+    .options label { display: block; margin: 5px 0; cursor: pointer; }
+    .feedback { margin-top: 10px; font-weight: bold; }
+    #nextBtn { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
+    #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+    .missed { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Cryptography Quiz</h1>
+    <div id="quiz"></div>
+    <button id="nextBtn">Next Question</button>
+    <div id="result"></div>
+    <div class="missed"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"Encryption is best defined as:",opts:["A) Converting ciphertext into plaintext","B) Converting plaintext into ciphertext","C) Encoding data for storage efficiency","D) Representing binary as ASCII"],ans:"B"},
+      {q:"Which of the following should encryption protect?",opts:["A) Data at rest only","B) Data in transit only","C) Both data at rest and data in transit","D) Only plaintext messages"],ans:"C"},
+      {q:"Which are examples of full disk encryption?",opts:["A) BitLocker","B) FileVault","C) AES Crypt","D) TPM"],ans:"AB"},
+      {q:"Entropy in cryptography refers to:",opts:["A) Encryption speed","B) Randomness/unpredictability","C) Prime factorization","D) Block size"],ans:"B"},
+      {q:"Which encoding standard supports 65,536 characters?",opts:["A) ASCII","B) UTF-8","C) UTF-16","D) Base64"],ans:"C"},
+      {q:"Which are properties of TRNGs?",opts:["A) Non-deterministic","B) Aperiodic","C) Based on physical processes","D) Always repeatable"],ans:"ABC"},
+      {q:"Which operator outputs 1 when inputs differ?",opts:["A) AND","B) OR","C) XOR","D) NOT"],ans:"C"},
+      {q:"What is the result of 5 mod 2?",opts:["A) 0","B) 1","C) 2","D) 3"],ans:"B"},
+      {q:"Which type of numbers are fundamental in public key cryptography?",opts:["A) Rational numbers","B) Prime numbers","C) Real numbers","D) Irrational numbers"],ans:"B"},
+      {q:"Which number theory concepts are used in cryptography?",opts:["A) Modular arithmetic","B) Prime numbers","C) Permutations","D) Combinations"],ans:"ABCD"},
+      {q:"Which endian format stores the least significant byte first?",opts:["A) Big Endian","B) Little Endian","C) Middle Endian","D) Reverse Endian"],ans:"B"},
+      {q:"Which PKCS standard defines password-based encryption?",opts:["A) PKCS #5","B) PKCS #7","C) PKCS #10","D) PKCS #12"],ans:"A"},
+      {q:"Which PKCS standard is used for Certificate Signing Requests (CSR)?",opts:["A) PKCS #5","B) PKCS #7","C) PKCS #10","D) PKCS #12"],ans:"C"},
+      {q:"Which are ways to check if a certificate is still valid?",opts:["A) CRL","B) OCSP","C) AES key length","D) TPM check"],ans:"AB"},
+      {q:"Which events in probability are independent?",opts:["A) Rolling a die and flipping a coin","B) Drawing cards without replacement","C) Modular arithmetic","D) XOR operations"],ans:"A"},
+      {q:"Which endian format stores the most significant byte first?",opts:["A) Little Endian","B) Big Endian","C) Reverse Endian","D) Mixed Endian"],ans:"B"},
+      {q:"Which are properties of hashing functions?",opts:["A) One-way (irreversible)","B) Produces fixed-length output","C) Detects integrity violations","D) Requires a key pair"],ans:"ABC"},
+      {q:"Which probability event means both cannot occur together?",opts:["A) Dependent","B) Independent","C) Mutually exclusive","D) Random"],ans:"C"},
+      {q:"Which cipher shifts letters a fixed distance in the alphabet?",opts:["A) Caesar","B) Playfair","C) Vigenere","D) Bifid"],ans:"A"},
+      {q:"Which are mono-alphabetic ciphers?",opts:["A) Caesar","B) Pigpen","C) Vigenere","D) Playfair"],ans:"AB"},
+      {q:"Which cipher uses a keyword repeated across text?",opts:["A) Playfair","B) Vigenere","C) Caesar","D) Pigpen"],ans:"B"},
+      {q:"Which cipher uses a 5x5 grid and omits the letter J?",opts:["A) Playfair","B) Bifid","C) Rail Fence","D) Four-square"],ans:"A"},
+      {q:"Which are polyalphabetic ciphers?",opts:["A) Vigenere","B) Enigma","C) One-time pad","D) Caesar"],ans:"ABC"},
+      {q:"Which WWII cipher machine ensured plaintext letters never encrypted to themselves?",opts:["A) Enigma","B) Bifid","C) Caesar","D) Pigpen"],ans:"A"},
+      {q:"Which cipher is considered unbreakable if used properly?",opts:["A) Vigenere","B) Enigma","C) One-time pad","D) Caesar"],ans:"C"},
+      {q:"Which is the main challenge with symmetric encryption?",opts:["A) Too slow","B) Key distribution","C) Requires two different keys","D) Doesn’t work for bulk data"],ans:"B"},
+      {q:"Which block cipher mode is considered weakest?",opts:["A) ECB","B) CBC","C) CFB","D) CTR"],ans:"A"},
+      {q:"Which modes make block ciphers behave like stream ciphers?",opts:["A) CFB","B) OFB","C) CTR","D) ECB"],ans:"ABC"},
+      {q:"Which cipher mode allows parallel processing?",opts:["A) CBC","B) ECB","C) CTR","D) OFB"],ans:"C"},
+      {q:"Which are stream ciphers?",opts:["A) RC4","B) A5/1","C) A5/2","D) ChaCha20"],ans:"ABD"},
+      {q:"Which are block ciphers?",opts:["A) AES","B) DES","C) KASUMI (A5/3)","D) RC4"],ans:"ABC"},
+      {q:"Which hashing method includes a secret key for authentication?",opts:["A) SHA","B) HMAC","C) MD5","D) Base64"],ans:"B"},
+      {q:"Which password-based system generates a new password each use?",opts:["A) OTP","B) SHA","C) RSA","D) AES"],ans:"A"},
+      {q:"Which OTP variant is based on time?",opts:["A) HOTP","B) TOTP","C) HMAC","D) SHA"],ans:"B"},
+      {q:"Which public key algorithm is based on factoring large numbers?",opts:["A) Diffie-Hellman","B) RSA","C) ECC","D) OTP"],ans:"B"},
+      {q:"Which algorithm is more efficient for embedded devices than RSA?",opts:["A) AES","B) ECC","C) RC4","D) DES"],ans:"B"},
+      {q:"Which key exchange method is vulnerable to man-in-the-middle attacks?",opts:["A) Diffie-Hellman","B) RSA","C) ECC","D) OTP"],ans:"A"},
+      {q:"Which cipher suite weakness was exploited by DHE_EXPORT attacks?",opts:["A) 512-bit primes","B) 128-bit AES","C) 3DES keys","D) SHA-1 hashes"],ans:"A"},
+      {q:"Which cipher algorithm is called KASUMI?",opts:["A) A5/1","B) A5/2","C) A5/3","D) RC4"],ans:"C"},
+      {q:"Which WPA2 mode uses AES-CCMP?",opts:["A) Personal and Enterprise","B) Only Personal","C) Only Enterprise","D) WEP compatibility"],ans:"A"},
+      {q:"Which are weaknesses of WEP?",opts:["A) 24-bit IV","B) Weak key scheduling (FMS)","C) No replay protection","D) MIC protection"],ans:"ABC"},
+      {q:"Which algorithm threatens RSA, DH, and ECC with quantum computing?",opts:["A) Grover’s","B) Shor’s","C) AES-CTR","D) RC4"],ans:"B"},
+      {q:"Which algorithm halves brute force time for symmetric ciphers in quantum models?",opts:["A) Grover’s","B) Shor’s","C) RSA","D) AES"],ans:"A"},
+      {q:"Which hash function is vulnerable to rainbow table attacks without salting?",opts:["A) SHA","B) HMAC","C) MD5","D) SHA-2"],ans:"A"},
+      {q:"Which algorithm is used to exchange symmetric keys securely?",opts:["A) Diffie-Hellman","B) Vigenere","C) OTP","D) Pigpen"],ans:"A"},
+      {q:"Which public key algorithm can also provide digital signatures?",opts:["A) El Gamal","B) Caesar","C) AES","D) OTP"],ans:"A"},
+      {q:"Which advanced public key algorithm prevents adaptive chosen ciphertext attacks?",opts:["A) Cramer-Shoup","B) El Gamal","C) RSA","D) AES"],ans:"A"},
+      {q:"Which describes Diffie-Hellman with elliptic curves?",opts:["A) DHE_EXPORT","B) ECDHE","C) PKCS #7","D) AES-CTR"],ans:"B"},
+      {q:"Which cipher mode requires an IV for the first block?",opts:["A) ECB","B) CBC","C) CTR","D) OFB"],ans:"B"},
+      {q:"Which cipher mode is least secure because patterns remain visible?",opts:["A) ECB","B) CTR","C) CBC","D) CFB"],ans:"A"},
+      {q:"Which cipher mode is best for parallel processing?",opts:["A) ECB","B) CBC","C) CTR","D) OFB"],ans:"C"},
+      {q:"Which cipher uses rotor machines and plugboards?",opts:["A) Enigma","B) Playfair","C) Caesar","D) Four-square"],ans:"A"},
+      {q:"Which is the U.S. government’s old standard block cipher, replaced by AES?",opts:["A) DES","B) ECC","C) El Gamal","D) RC4"],ans:"A"},
+      {q:"Which key exchange provides forward secrecy?",opts:["A) Static RSA","B) ECDHE","C) DES","D) OTP"],ans:"B"},
+      {q:"Which hash function produces fixed-length output regardless of input?",opts:["A) SHA","B) Base64","C) ASCII","D) UTF-16"],ans:"A"},
+      {q:"Which algorithm was a wireless stream cipher used in GSM?",opts:["A) A5/1","B) AES","C) ECC","D) Diffie-Hellman"],ans:"A"},
+      {q:"Which wireless security protocol introduced TKIP as a patch to WEP?",opts:["A) WPA","B) WPA2","C) GSM","D) AES"],ans:"A"},
+      {q:"Which protocol introduced AES-CCMP as mandatory?",opts:["A) WEP","B) WPA","C) WPA2","D) GSM"],ans:"C"},
+      {q:"Which algorithm did Bitcoin adopt for its cryptography?",opts:["A) RSA","B) ECC (secp256k1)","C) Diffie-Hellman","D) AES"],ans:"B"},
+      {q:"Which is the purpose of salting in encryption?",opts:["A) Makes ciphertext smaller","B) Adds randomness to prevent repeat ciphertexts","C) Replaces keys with IVs","D) Speeds up decryption"],ans:"B"}
+    ];
+
+    let current = 0;
+    let score = 0;
+    let missed = [];
+
+    // Shuffle
+    questions.sort(() => Math.random() - 0.5);
+
+    const quizDiv = document.getElementById("quiz");
+    const nextBtn = document.getElementById("nextBtn");
+    const resultDiv = document.getElementById("result");
+    const missedDiv = document.querySelector(".missed");
+
+    function loadQuestion() {
+      if (current >= questions.length) {
+        quizDiv.innerHTML = "";
+        nextBtn.style.display = "none";
+        resultDiv.innerHTML = `Quiz complete! You scored ${score}/${questions.length}`;
+        if (missed.length > 0) {
+          missedDiv.innerHTML = "<h3>Review of Missed Questions:</h3>";
+          missed.forEach(m => {
+            missedDiv.innerHTML += `<p><b>${m.q}</b><br>
+              Your answer: ${m.your}<br>
+              Correct answer: ${m.ans}</p>`;
+          });
+        } else {
+          missedDiv.innerHTML = "🎉 Perfect Score!";
+        }
+        return;
+      }
+
+      const q = questions[current];
+      quizDiv.innerHTML = `<div class="question">${q.q}</div>`;
+      let optionsHTML = "";
+      q.opts.forEach(opt => {
+        optionsHTML += `<label><input type="checkbox" name="option" value="${opt.charAt(0)}"> ${opt}</label>`;
+      });
+      quizDiv.innerHTML += `<div class="options">${optionsHTML}</div><div class="feedback"></div>`;
+    }
+
+    nextBtn.addEventListener("click", () => {
+      const selected = Array.from(document.querySelectorAll("input[name=option]:checked"))
+        .map(cb => cb.value).join("");
+      const correct = questions[current].ans;
+
+      const feedback = document.querySelector(".feedback");
+      if (selected === correct) {
+        feedback.textContent = "✅ Correct!";
+        score++;
+      } else {
+        feedback.textContent = `❌ Incorrect! Correct: ${correct}`;
+        missed.push({q: questions[current].q, ans: correct, your: selected || "None"});
+      }
+
+      current++;
+      setTimeout(loadQuestion, 1000);
+    });
+
+    loadQuestion();
+  </script>
+</body>
+</html>
